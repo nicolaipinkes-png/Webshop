@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { products, categories } from "@/lib/products";
+import { getProductsByCategory } from "@/lib/products";
+import { categories } from "@/lib/categories";
 import { ProductCard } from "@/components/product-card";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +11,7 @@ export default async function ProductsPage({
 }) {
   const { category } = await searchParams;
   const active = category && categories.includes(category as (typeof categories)[number]) ? category : "Alle";
-  const filtered = active === "Alle" ? products : products.filter((p) => p.category === active);
+  const filtered = await getProductsByCategory(active);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

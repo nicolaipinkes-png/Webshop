@@ -1,14 +1,10 @@
 import { notFound } from "next/navigation";
 import { Star } from "lucide-react";
-import { getProductBySlug, products } from "@/lib/products";
+import { getProductBySlug, getProductsByCategory } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { ProductImage } from "@/components/product-image";
 import { ProductCard } from "@/components/product-card";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
 
 export default async function ProductPage({
   params,
@@ -16,10 +12,11 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const sameCategory = await getProductsByCategory(product.category);
+  const related = sameCategory.filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

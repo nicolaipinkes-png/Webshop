@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Sparkles, Truck, ShieldCheck, RotateCcw } from "lucide-react";
-import { products } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
 
 const perks = [
@@ -9,7 +9,8 @@ const perks = [
   { icon: ShieldCheck, title: "Sichere Zahlung", text: "SSL-verschlüsselt" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const products = await getAllProducts();
   const featured = products.slice(0, 4);
   const bestsellers = products.filter((p) => p.badge === "bestseller");
 

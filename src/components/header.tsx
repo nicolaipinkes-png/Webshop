@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Search, ShoppingBag, Sparkles, Menu, X } from "lucide-react";
 import { useCartStore, cartItemCount } from "@/lib/cart-store";
-import { categories } from "@/lib/products";
+import { categories } from "@/lib/categories";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
