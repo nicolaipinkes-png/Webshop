@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { useCartStore, cartTotalCents } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/utils";
 import { ProductImage } from "@/components/product-image";
@@ -8,6 +10,31 @@ import { ProductImage } from "@/components/product-image";
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const total = cartTotalCents(items);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleCheckout() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((i) => ({
+            productId: i.product.id,
+            quantity: i.quantity,
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error("Checkout konnte nicht gestartet werden.");
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch {
+      setError("Da ist etwas schiefgelaufen. Bitte versuch es erneut.");
+      setLoading(false);
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -26,9 +53,9 @@ export default function CheckoutPage() {
       <div className="mt-8 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-border p-6">
-            <h2 className="text-sm font-medium">Lieferadresse</h2>
+            <h2 className="text-sm font-medium">Lieferadresse & Zahlung</h2>
             <p className="mt-2 text-sm text-foreground/60">
-              Zahlungsanbieter (Stripe/PayPal) und Adressformular werden im nächsten Schritt angebunden.
+              Adresse, Zahlungsmethode und Rechnung erfasst du im nächsten Schritt sicher bei Stripe.
             </p>
           </div>
         </div>
@@ -53,6 +80,17 @@ export default function CheckoutPage() {
               <span>Gesamt</span>
               <span>{formatPrice(total)}</span>
             </div>
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-60"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              Jetzt kostenpflichtig bestellen
+            </button>
+            {error && (
+              <p className="mt-3 text-sm text-red-500">{error}</p>
+            )}
           </div>
         </div>
       </div>
