@@ -41,7 +41,12 @@ export function CartDrawer() {
             <ul className="space-y-4">
               {items.map(({ product, quantity }) => (
                 <li key={product.id} className="flex gap-3">
-                  <ProductImage gradient={product.image} className="h-20 w-20 shrink-0" />
+                  <ProductImage
+                    src={product.image}
+                    alt={product.name}
+                    className="h-20 w-20 shrink-0"
+                    sizes="80px"
+                  />
                   <div className="flex flex-1 flex-col">
                     <div className="flex items-start justify-between gap-2">
                       <span className="text-sm font-medium leading-tight">{product.name}</span>

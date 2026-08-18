@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
-            <h4 className="text-lg font-semibold tracking-tight">
+            <h4 className="font-serif text-xl font-medium tracking-tight">
               NOVA<span className="text-accent">.</span>
             </h4>
             <p className="mt-2 text-sm text-foreground/60">

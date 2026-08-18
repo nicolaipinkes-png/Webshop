@@ -23,7 +23,7 @@ export function Header() {
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+          <Link href="/" className="font-serif text-xl font-medium tracking-tight">
             NOVA<span className="text-accent">.</span>
           </Link>
           <nav className="hidden items-center gap-6 md:flex">

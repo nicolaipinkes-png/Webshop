@@ -112,7 +112,7 @@ export function AiAssistant() {
                           onClick={() => setOpen(false)}
                           className="rounded-xl border border-border p-2 transition-colors hover:border-accent"
                         >
-                          <ProductImage gradient={p.image} className="aspect-square w-full" />
+                          <ProductImage src={p.image} alt={p.name} className="aspect-square w-full" sizes="140px" />
                           <p className="mt-1.5 line-clamp-1 text-xs font-medium">{p.name}</p>
                           <div className="mt-0.5 flex items-center justify-between">
                             <span className="flex items-center gap-0.5 text-[10px] text-foreground/60">

@@ -21,7 +21,13 @@ export default async function ProductPage({
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-2">
-        <ProductImage gradient={product.image} className="aspect-square w-full" />
+        <ProductImage
+          src={product.image}
+          alt={product.name}
+          className="aspect-square w-full"
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          priority
+        />
         <div>
           <p className="text-sm text-foreground/60">{product.category}</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">{product.name}</h1>

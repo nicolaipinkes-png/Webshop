@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Sparkles, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { getAllProducts } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
 
@@ -16,42 +17,46 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-28">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground/70">
-              <Sparkles className="h-3.5 w-3.5 text-accent" />
-              Jetzt mit KI-Beratung
-            </span>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              Shopping, das
-              <br />
-              dich versteht.
-            </h1>
-            <p className="mt-5 max-w-md text-base text-foreground/60">
-              Kuratierte Produkte für Technik, Wohnen, Mode und Outdoor — mit
-              einem KI-Assistenten, der dir hilft, genau das Richtige zu finden.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className="flex h-12 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-opacity hover:opacity-90"
-              >
-                Jetzt entdecken
-              </Link>
-              <Link
-                href="/search"
-                className="flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-medium transition-colors hover:bg-surface-muted"
-              >
-                Produkte durchsuchen
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="aspect-square rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600" />
-            <div className="mt-8 aspect-square rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600" />
-            <div className="-mt-8 aspect-square rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500" />
-            <div className="aspect-square rounded-2xl bg-gradient-to-br from-rose-400 to-pink-600" />
+      <section className="relative flex min-h-[85vh] items-end overflow-hidden sm:min-h-[90vh]">
+        <Image
+          src="https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=2000&q=80&auto=format&fit=crop"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-background/10 to-transparent" />
+
+        <div className="animate-in relative mx-auto w-full max-w-7xl px-4 pb-16 pt-32 sm:px-6 sm:pb-24 lg:px-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/20 px-3 py-1 text-xs font-medium text-foreground/80 backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            Jetzt mit KI-Beratung
+          </span>
+          <h1 className="mt-5 max-w-xl text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
+            Zuhause ankommen,
+            <br />
+            neu entdeckt.
+          </h1>
+          <p className="mt-5 max-w-md text-base text-foreground/70">
+            Kuratierte Dekoration, Technik, Mode und Outdoor-Ausstattung — mit
+            einem KI-Assistenten, der dir hilft, genau das Richtige zu finden.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/products"
+              className="flex h-12 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-medium text-accent-foreground transition-transform hover:scale-[1.03]"
+            >
+              Jetzt entdecken
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/search"
+              className="flex h-12 items-center justify-center rounded-full border border-white/20 bg-black/10 px-6 text-sm font-medium backdrop-blur transition-colors hover:bg-black/25"
+            >
+              Produkte durchsuchen
+            </Link>
           </div>
         </div>
       </section>
@@ -63,7 +68,7 @@ export default async function Home() {
               <p.icon className="h-5 w-5 text-accent" />
               <div>
                 <p className="text-sm font-medium">{p.title}</p>
-                <p className="text-xs text-foreground/60">{p.text}</p>
+                <p className="text-xs text-foreground-muted">{p.text}</p>
               </div>
             </div>
           ))}
@@ -72,7 +77,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight">Neu eingetroffen</h2>
+          <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">Neu eingetroffen</h2>
           <Link href="/products" className="text-sm text-accent hover:underline">
             Alle ansehen
           </Link>
@@ -84,10 +89,44 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl">
+          <Image
+            src="https://images.unsplash.com/photo-1601804590276-e19ce20343da?w=1600&q=80&auto=format&fit=crop"
+            alt=""
+            width={1600}
+            height={700}
+            className="h-[22rem] w-full object-cover sm:h-[26rem]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/40 to-transparent" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-md px-8 sm:px-12">
+              <p className="text-sm font-medium uppercase tracking-widest text-accent">
+                Saisonstart
+              </p>
+              <h2 className="mt-3 text-3xl font-medium tracking-tight sm:text-4xl">
+                Gemütlich durch den Herbst
+              </h2>
+              <p className="mt-4 text-sm text-foreground/70">
+                Warme Decken, sanftes Licht und Textilien zum Verlieben —
+                entdeck unsere Wohnen-Kollektion.
+              </p>
+              <Link
+                href="/products?category=Wohnen"
+                className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              >
+                Kollektion ansehen
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {bestsellers.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
           <div className="mb-8 flex items-end justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight">Bestseller</h2>
+            <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">Bestseller</h2>
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
             {bestsellers.map((p) => (

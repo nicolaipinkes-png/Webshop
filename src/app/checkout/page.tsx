@@ -65,7 +65,12 @@ export default function CheckoutPage() {
             <ul className="mt-4 space-y-3">
               {items.map(({ product, quantity }) => (
                 <li key={product.id} className="flex items-center gap-3">
-                  <ProductImage gradient={product.image} className="h-12 w-12 shrink-0" />
+                  <ProductImage
+                    src={product.image}
+                    alt={product.name}
+                    className="h-12 w-12 shrink-0"
+                    sizes="48px"
+                  />
                   <div className="flex-1 text-sm">
                     <p className="leading-tight">{product.name}</p>
                     <p className="text-foreground/50">Menge: {quantity}</p>

@@ -20,9 +20,9 @@ export function ProductCard({ product }: { product: Product }) {
     <div className="group flex flex-col">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative">
-          <ProductImage gradient={product.image} className="aspect-square w-full transition-transform group-hover:scale-[1.02]" />
+          <ProductImage src={product.image} alt={product.name} className="aspect-square w-full" />
           {product.badge && (
-            <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-black backdrop-blur dark:bg-black/70 dark:text-white">
+            <span className="absolute left-3 top-3 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
               {badgeLabel[product.badge]}
             </span>
           )}
