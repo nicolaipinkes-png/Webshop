@@ -1,23 +1,33 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, X, Send } from "lucide-react";
+import Link from "next/link";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { Sparkles, X, Send, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
+import { ProductImage } from "./product-image";
 
-type Message = { role: "user" | "assistant"; content: string };
-
-const INITIAL: Message = {
-  role: "assistant",
-  content:
-    "Hi! Ich bin dein Shopping-Assistent. Beschreib mir, wonach du suchst — z.B. \"eine leichte Jacke für Herbstwanderungen unter 100€\" — und ich helfe dir bei der Auswahl.",
+type RecommendedProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  priceCents: number;
+  currency: string;
+  image: string;
+  category: string;
+  rating: number;
 };
 
 export function AiAssistant() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([INITIAL]);
   const [input, setInput] = useState("");
-  const [pending, setPending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/assistant" }),
+  });
 
   useEffect(() => {
     const handler = () => setOpen(true);
@@ -29,24 +39,13 @@ export function AiAssistant() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, open]);
 
-  async function send() {
+  const pending = status === "submitted" || status === "streaming";
+
+  function send() {
     const text = input.trim();
     if (!text || pending) return;
-    setMessages((m) => [...m, { role: "user", content: text }]);
+    sendMessage({ text });
     setInput("");
-    setPending(true);
-
-    // TODO: replace with a real call to /api/assistant once an LLM backend is wired up
-    await new Promise((r) => setTimeout(r, 600));
-    setMessages((m) => [
-      ...m,
-      {
-        role: "assistant",
-        content:
-          "Diese Antwort ist aktuell simuliert — sobald die KI-API angebunden ist, bekommst du hier echte, produktbasierte Empfehlungen.",
-      },
-    ]);
-    setPending(false);
   }
 
   return (
@@ -79,19 +78,61 @@ export function AiAssistant() {
         </div>
 
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={cn(
-                "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
-                m.role === "user"
-                  ? "ml-auto bg-accent text-accent-foreground"
-                  : "bg-surface-muted text-foreground"
-              )}
-            >
-              {m.content}
+          <div className="max-w-[85%] rounded-2xl bg-surface-muted px-3.5 py-2 text-sm leading-relaxed text-foreground">
+            Hi! Ich bin dein Shopping-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;eine leichte Jacke für Herbstwanderungen&quot; — und ich helfe dir bei der Auswahl.
+          </div>
+
+          {messages.map((m) => (
+            <div key={m.id} className={cn("space-y-2", m.role === "user" && "flex flex-col items-end")}>
+              {m.parts.map((part, i) => {
+                if (part.type === "text") {
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
+                        m.role === "user"
+                          ? "ml-auto bg-accent text-accent-foreground"
+                          : "bg-surface-muted text-foreground"
+                      )}
+                    >
+                      {part.text}
+                    </div>
+                  );
+                }
+                if (part.type === "tool-recommendProducts" && part.state === "output-available") {
+                  const products = part.output as RecommendedProduct[];
+                  if (products.length === 0) return null;
+                  return (
+                    <div key={i} className="grid grid-cols-2 gap-2">
+                      {products.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/products/${p.slug}`}
+                          onClick={() => setOpen(false)}
+                          className="rounded-xl border border-border p-2 transition-colors hover:border-accent"
+                        >
+                          <ProductImage gradient={p.image} className="aspect-square w-full" />
+                          <p className="mt-1.5 line-clamp-1 text-xs font-medium">{p.name}</p>
+                          <div className="mt-0.5 flex items-center justify-between">
+                            <span className="flex items-center gap-0.5 text-[10px] text-foreground/60">
+                              <Star className="h-2.5 w-2.5 fill-current text-amber-500" />
+                              {p.rating}
+                            </span>
+                            <span className="text-xs font-semibold">
+                              {formatPrice(p.priceCents, p.currency)}
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           ))}
+
           {pending && (
             <div className="w-fit rounded-2xl bg-surface-muted px-3.5 py-2 text-sm text-foreground/50">
               …
