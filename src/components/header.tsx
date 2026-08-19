@@ -83,7 +83,9 @@ export function Header() {
               </span>
             )}
           </button>
-          <LanguageSwitcher />
+          <div className="hidden sm:block">
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
 
@@ -99,6 +101,9 @@ export function Header() {
               {dict.categories[c]}
             </Link>
           ))}
+          <div className="mt-2 border-t border-border pt-3 sm:hidden">
+            <LanguageSwitcher />
+          </div>
         </nav>
       )}
     </header>
