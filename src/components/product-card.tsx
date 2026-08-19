@@ -6,6 +6,7 @@ import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { ProductImage } from "./product-image";
+import { WishlistButton } from "./wishlist-button";
 
 const badgeLabel: Record<string, string> = {
   new: "Neu",
@@ -18,16 +19,20 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group flex flex-col">
-      <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative">
+      <div className="relative">
+        <Link href={`/products/${product.slug}`} className="block">
           <ProductImage src={product.image} alt={product.name} className="aspect-square w-full" />
           {product.badge && (
             <span className="absolute left-3 top-3 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
               {badgeLabel[product.badge]}
             </span>
           )}
-        </div>
-      </Link>
+        </Link>
+        <WishlistButton
+          product={product}
+          className="absolute right-3 top-3 h-8 w-8 border border-white/10 bg-black/50 backdrop-blur hover:border-accent"
+        />
+      </div>
       <div className="mt-3 flex flex-1 flex-col">
         <Link href={`/products/${product.slug}`}>
           <h3 className="text-sm font-medium">{product.name}</h3>

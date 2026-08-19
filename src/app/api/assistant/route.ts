@@ -5,6 +5,7 @@ import { inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { products as productsTable } from "@/lib/db/schema";
 import { getAllProducts } from "@/lib/products";
+import { findOrders } from "@/lib/orders";
 import { categories } from "@/lib/categories";
 import { formatPrice } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ Regeln:
 - Wenn du Produkte zeigen willst, rufe IMMER das Tool "showProducts" mit den passenden slugs auf (max. 4). Erfinde niemals Preise oder Eigenschaften – die Karten werden serverseitig mit echten Daten befüllt.
 - Wenn nichts passt, sag das ehrlich und frag nach mehr Details, statt etwas zu erfinden oder ein unpassendes Produkt zu zeigen.
 - Wenn der Kunde ausdrücklich sagt, dass er ein Produkt kaufen/in den Warenkorb legen möchte (z.B. "leg das in den Warenkorb", "ich nehme die Kopfhörer"), rufe das Tool "addToCart" mit dem passenden slug auf. Frag bei Unklarheit erst nach, welches Produkt gemeint ist.
+- Wenn der Kunde nach dem Status oder Verbleib einer Bestellung fragt (z.B. "Wo ist meine Bestellung?", "Ist meine Bestellung schon raus?"), rufe das Tool "checkOrderStatus" auf. Frag zuerst nach der Bestellnummer (aus der Bestätigungs-E-Mail) oder der E-Mail-Adresse, falls noch keine von beidem im Gespräch genannt wurde. Erfinde niemals einen Bestellstatus – nutze ausschließlich die Daten aus dem Tool-Ergebnis.
 - Halte Textantworten auf 2-3 Sätze begrenzt; die Produktkarten sprechen für sich.`;
 
   const result = streamText({
@@ -39,6 +41,9 @@ Regeln:
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
     stopWhen: stepCountIs(3),
+    providerOptions: {
+      anthropic: { thinking: { type: "disabled" } },
+    },
     tools: {
       showProducts: tool({
         description:
@@ -74,6 +79,30 @@ Regeln:
           slug: z.string().describe("Slug des Produkts aus dem Katalog"),
           quantity: z.number().int().min(1).max(10).default(1),
         }),
+      }),
+      checkOrderStatus: tool({
+        description:
+          "Sucht den Status einer Bestellung anhand der Bestellnummer und/oder E-Mail-Adresse.",
+        inputSchema: z.object({
+          orderId: z
+            .string()
+            .optional()
+            .describe("Die Bestellnummer aus der Bestätigungs-E-Mail"),
+          email: z
+            .string()
+            .optional()
+            .describe("Die E-Mail-Adresse, mit der bestellt wurde"),
+        }),
+        execute: async ({ orderId, email }) => {
+          if (!orderId && !email) {
+            return { found: false as const };
+          }
+          const results = await findOrders({ orderId, email });
+          if (results.length === 0) {
+            return { found: false as const };
+          }
+          return { found: true as const, orders: results };
+        },
       }),
     },
   });

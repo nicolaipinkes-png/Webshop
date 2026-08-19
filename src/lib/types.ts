@@ -10,4 +10,5 @@ export type Product = {
   badge: string | null;
   rating: number;
   reviewCount: number;
+  createdAt: Date;
 };

@@ -1,10 +1,59 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Star } from "lucide-react";
-import { getProductBySlug, getProductsByCategory } from "@/lib/products";
+import { getProductBySlug } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import { ProductImage } from "@/components/product-image";
-import { ProductCard } from "@/components/product-card";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { WishlistButton } from "@/components/wishlist-button";
+import { ComplementaryProducts } from "@/components/complementary-products";
+import { SITE_URL } from "@/lib/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+  if (!product) return {};
+
+  return {
+    title: `${product.name} — NOVA`,
+    description: product.description,
+    alternates: { canonical: `${SITE_URL}/products/${product.slug}` },
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: [{ url: product.image }],
+    },
+  };
+}
+
+function productJsonLd(product: NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>) {
+  const json = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.image,
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      url: `${SITE_URL}/products/${product.slug}`,
+      priceCurrency: product.currency,
+      price: (product.priceCents / 100).toFixed(2),
+      availability: "https://schema.org/InStock",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: product.rating,
+      reviewCount: product.reviewCount,
+    },
+  };
+  // Prevent the JSON from prematurely closing the <script> tag.
+  return JSON.stringify(json).replace(/</g, "\\u003c");
+}
 
 export default async function ProductPage({
   params,
@@ -15,11 +64,12 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const sameCategory = await getProductsByCategory(product.category);
-  const related = sameCategory.filter((p) => p.id !== product.id).slice(0, 4);
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: productJsonLd(product) }}
+      />
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductImage
           src={product.image}
@@ -39,7 +89,13 @@ export default async function ProductPage({
           <p className="mt-6 text-2xl font-semibold">{formatPrice(product.priceCents, product.currency)}</p>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-foreground/70">{product.description}</p>
 
-          <AddToCartButton product={product} />
+          <div className="mt-8 flex max-w-xs gap-3">
+            <AddToCartButton product={product} />
+            <WishlistButton
+              product={product}
+              className="h-12 w-12 shrink-0 border border-border hover:border-accent"
+            />
+          </div>
 
           <dl className="mt-10 space-y-2 border-t border-border pt-6 text-sm">
             <div className="flex justify-between">
@@ -54,16 +110,7 @@ export default async function ProductPage({
         </div>
       </div>
 
-      {related.length > 0 && (
-        <section className="mt-20">
-          <h2 className="mb-8 text-xl font-semibold tracking-tight">Das könnte dir auch gefallen</h2>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
+      <ComplementaryProducts product={product} />
     </div>
   );
 }

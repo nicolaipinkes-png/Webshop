@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
-import { Sparkles, X, Send, Star, CheckCircle2 } from "lucide-react";
+import { Sparkles, X, Send, Star, CheckCircle2, PackageSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/types";
@@ -20,6 +20,26 @@ type RecommendedProduct = {
   image: string;
   category: string;
   rating: number;
+};
+
+type OrderStatusOutput =
+  | { found: false }
+  | {
+      found: true;
+      orders: {
+        id: string;
+        status: string;
+        totalCents: number;
+        currency: string;
+        createdAt: string;
+        items: { name: string; quantity: number }[];
+      }[];
+    };
+
+const orderStatusLabel: Record<string, string> = {
+  pending: "Zahlung ausstehend",
+  paid: "Bezahlt · wird vorbereitet",
+  failed: "Zahlung fehlgeschlagen",
 };
 
 export function AiAssistant({ products }: { products: Product[] }) {
@@ -164,6 +184,34 @@ export function AiAssistant({ products }: { products: Product[] }) {
                     >
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
                       {output.quantity}× {output.name} in den Warenkorb gelegt
+                    </div>
+                  );
+                }
+                if (part.type === "tool-checkOrderStatus" && part.state === "output-available") {
+                  const output = part.output as OrderStatusOutput;
+                  if (!output.found) return null;
+                  return (
+                    <div key={i} className="space-y-2">
+                      {output.orders.map((order) => (
+                        <div
+                          key={order.id}
+                          className="max-w-[85%] rounded-2xl border border-border bg-surface-muted px-3.5 py-2.5 text-sm text-foreground"
+                        >
+                          <div className="flex items-center gap-2 font-medium">
+                            <PackageSearch className="h-4 w-4 shrink-0 text-accent" />
+                            {orderStatusLabel[order.status] ?? order.status}
+                          </div>
+                          <p className="mt-1 text-xs text-foreground/60">
+                            Bestellnummer: {order.id}
+                          </p>
+                          <p className="mt-1 text-xs text-foreground/70">
+                            {order.items.map((it) => `${it.quantity}× ${it.name}`).join(", ")}
+                          </p>
+                          <p className="mt-1 text-xs font-medium">
+                            {formatPrice(order.totalCents, order.currency)}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   );
                 }

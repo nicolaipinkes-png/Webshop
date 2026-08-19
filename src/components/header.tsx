@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search, ShoppingBag, Sparkles, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, Sparkles, Menu, X, Heart } from "lucide-react";
 import { useCartStore, cartItemCount } from "@/lib/cart-store";
+import { useWishlistStore } from "@/lib/wishlist-store";
 import { categories } from "@/lib/categories";
 
 export function Header() {
@@ -11,6 +12,7 @@ export function Header() {
   const items = useCartStore((s) => s.items);
   const openCart = useCartStore((s) => s.open);
   const count = cartItemCount(items);
+  const wishlistCount = useWishlistStore((s) => s.items.length);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
@@ -54,6 +56,18 @@ export function Header() {
           >
             <Sparkles className="h-4.5 w-4.5" />
           </button>
+          <Link
+            href="/wishlist"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted"
+            aria-label="Merkliste öffnen"
+          >
+            <Heart className="h-4.5 w-4.5" />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-foreground">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
           <button
             className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted"
             aria-label="Warenkorb öffnen"

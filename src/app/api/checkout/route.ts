@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
     client_reference_id: orderId,
     metadata: { orderId },
     shipping_address_collection: { allowed_countries: ["DE", "AT", "CH"] },
+    allow_promotion_codes: true,
   });
 
   await db.insert(orders).values({

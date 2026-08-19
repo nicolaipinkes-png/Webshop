@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
         .set({
           status: "paid",
           customerEmail: session.customer_details?.email,
+          // Reflects any promotion code discount applied at checkout.
+          totalCents: session.amount_total ?? undefined,
           confirmationEmailSentAt: new Date(),
         })
         .where(
