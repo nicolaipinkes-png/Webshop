@@ -76,6 +76,15 @@ export function ProductForm({
           <input name="image" type="url" required defaultValue={product?.image} className="input" />
         </Field>
 
+        <Field label="Weitere Bild-URLs (eine pro Zeile, optional)">
+          <textarea
+            name="images"
+            rows={3}
+            defaultValue={product?.images?.join("\n")}
+            className="input resize-none"
+          />
+        </Field>
+
         <div className="grid grid-cols-3 gap-4">
           <Field label="Badge">
             <select name="badge" defaultValue={product?.badge ?? ""} className="input">

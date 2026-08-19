@@ -2,6 +2,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CartDrawer } from "@/components/cart-drawer";
 import { AiAssistant } from "@/components/ai-assistant";
+import { StyleQuiz } from "@/components/style-quiz";
 import { getAllProducts } from "@/lib/products";
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
       <Footer />
       <CartDrawer />
       <AiAssistant products={products} />
+      <StyleQuiz />
     </>
   );
 }

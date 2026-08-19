@@ -9,6 +9,10 @@ import { products } from "@/lib/db/schema";
 
 function readProductForm(formData: FormData) {
   const badge = String(formData.get("badge") ?? "");
+  const images = String(formData.get("images") ?? "")
+    .split("\n")
+    .map((url) => url.trim())
+    .filter(Boolean);
   return {
     slug: String(formData.get("slug") ?? "").trim(),
     name: String(formData.get("name") ?? "").trim(),
@@ -17,6 +21,7 @@ function readProductForm(formData: FormData) {
     currency: "EUR",
     category: String(formData.get("category") ?? "").trim(),
     image: String(formData.get("image") ?? "").trim(),
+    images: images.length > 0 ? images : null,
     badge: badge === "" ? null : badge,
     rating: Number(formData.get("rating")),
     reviewCount: Number(formData.get("reviewCount")),

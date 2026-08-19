@@ -3,10 +3,11 @@ import { notFound } from "next/navigation";
 import { Star } from "lucide-react";
 import { getProductBySlug } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
-import { ProductImage } from "@/components/product-image";
+import { ProductGallery } from "@/components/product-gallery";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { WishlistButton } from "@/components/wishlist-button";
 import { ComplementaryProducts } from "@/components/complementary-products";
+import { ProductReviews } from "@/components/product-reviews";
 import { SITE_URL } from "@/lib/site";
 
 export async function generateMetadata({
@@ -71,12 +72,9 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: productJsonLd(product) }}
       />
       <div className="grid gap-10 lg:grid-cols-2">
-        <ProductImage
-          src={product.image}
+        <ProductGallery
+          images={[product.image, ...(product.images ?? [])]}
           alt={product.name}
-          className="aspect-square w-full"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          priority
         />
         <div>
           <p className="text-sm text-foreground/60">{product.category}</p>
@@ -111,6 +109,7 @@ export default async function ProductPage({
       </div>
 
       <ComplementaryProducts product={product} />
+      <ProductReviews product={product} />
     </div>
   );
 }

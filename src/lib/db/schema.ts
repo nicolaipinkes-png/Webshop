@@ -15,6 +15,7 @@ export const products = pgTable("products", {
   currency: text("currency").notNull(),
   category: text("category").notNull(),
   image: text("image").notNull(),
+  images: text("images").array(),
   badge: text("badge"),
   rating: real("rating").notNull(),
   reviewCount: integer("review_count").notNull(),
@@ -43,4 +44,15 @@ export const orderItems = pgTable("order_items", {
   name: text("name").notNull(),
   priceCents: integer("price_cents").notNull(),
   quantity: integer("quantity").notNull(),
+});
+
+export const reviews = pgTable("reviews", {
+  id: text("id").primaryKey(),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id),
+  authorName: text("author_name").notNull(),
+  rating: integer("rating").notNull(),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });

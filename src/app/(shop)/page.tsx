@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { getAllProducts } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
+import { PersonalizedProducts } from "@/components/personalized-products";
 
 const perks = [
   { icon: Truck, title: "Kostenloser Versand", text: "Ab 50€ Bestellwert" },
@@ -75,6 +76,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <PersonalizedProducts products={products} />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">

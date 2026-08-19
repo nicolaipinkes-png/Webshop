@@ -7,6 +7,7 @@ export type Product = {
   currency: string;
   category: string;
   image: string;
+  images: string[] | null;
   badge: string | null;
   rating: number;
   reviewCount: number;
