@@ -26,6 +26,7 @@ export function Footer() {
               <li><Link href="/impressum" className="hover:text-foreground">Impressum</Link></li>
               <li><Link href="/datenschutz" className="hover:text-foreground">Datenschutz</Link></li>
               <li><Link href="/agb" className="hover:text-foreground">AGB</Link></li>
+              <li><Link href="/widerrufsrecht" className="hover:text-foreground">Widerrufsrecht</Link></li>
             </ul>
           </div>
           <div>
