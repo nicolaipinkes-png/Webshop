@@ -18,13 +18,13 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div className="relative flex items-center">
-      <Globe className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-foreground/50" />
+    <div className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted">
+      <Globe className="pointer-events-none h-4.5 w-4.5" />
       <select
         value={locale}
         onChange={(e) => switchTo(e.target.value as Locale)}
         aria-label="Sprache wechseln / Change language"
-        className="h-9 appearance-none rounded-full border border-border bg-background pl-8 pr-3 text-xs outline-none focus:border-accent"
+        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0 outline-none"
       >
         {locales.map((l) => (
           <option key={l} value={l}>
