@@ -13,6 +13,12 @@ function unsplash(id: string) {
   return `https://images.unsplash.com/${id}?w=1200&q=80&auto=format&fit=crop`;
 }
 
+// Detail crops of the SAME source photo as the hero image, so the gallery
+// always shows the identical product instead of a mismatched stock photo.
+function unsplashCrop(id: string, fpX: number, fpY: number, fpZ: number) {
+  return `https://images.unsplash.com/${id}?w=1200&h=1200&q=80&auto=format&fit=crop&crop=focalpoint&fp-x=${fpX}&fp-y=${fpY}&fp-z=${fpZ}`;
+}
+
 const productTranslations: Record<
   string,
   Record<"en" | "fr" | "es", { name: string; description: string }>
@@ -201,8 +207,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Sofas",
     image: unsplash("photo-1768946131549-f03cafef7bc1"),
     images: [
-      unsplash("photo-1541085929911-dea736e9287b"),
-      unsplash("photo-1571164860029-856acbc24b4a"),
+      unsplashCrop("photo-1768946131549-f03cafef7bc1", 0.28, 0.7, 2.2),
+      unsplashCrop("photo-1768946131549-f03cafef7bc1", 0.72, 0.72, 2.2),
     ],
     badge: "bestseller",
     rating: 4.8,
@@ -219,8 +225,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Beleuchtung",
     image: unsplash("photo-1517991104123-1d56a6e81ed9"),
     images: [
-      unsplash("photo-1592195985871-2d326ada5d51"),
-      unsplash("photo-1582737068804-2e7d18036fe7"),
+      unsplashCrop("photo-1517991104123-1d56a6e81ed9", 0.62, 0.35, 2),
+      unsplashCrop("photo-1517991104123-1d56a6e81ed9", 0.62, 0.78, 2),
     ],
     badge: null,
     rating: 4.5,
@@ -237,8 +243,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Möbel",
     image: unsplash("photo-1566921895456-1cee64031c33"),
     images: [
-      unsplash("photo-1559662780-33af019fd570"),
-      unsplash("photo-1584280795027-321f4d68e77b"),
+      unsplashCrop("photo-1566921895456-1cee64031c33", 0.68, 0.32, 1.8),
+      unsplashCrop("photo-1566921895456-1cee64031c33", 0.68, 0.68, 1.8),
     ],
     badge: "new",
     rating: 4.9,
@@ -255,8 +261,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Möbel",
     image: unsplash("photo-1563371557-d98db5294563"),
     images: [
-      unsplash("photo-1727819584099-772894afd8e9"),
-      unsplash("photo-1644410960965-0a43b7358f70"),
+      unsplashCrop("photo-1563371557-d98db5294563", 0.25, 0.78, 2),
+      unsplashCrop("photo-1563371557-d98db5294563", 0.75, 0.72, 2),
     ],
     badge: "sale",
     rating: 4.5,
@@ -273,8 +279,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Textilien",
     image: unsplash("photo-1583847268964-b28dc8f51f92"),
     images: [
-      unsplash("photo-1674475760738-8c7af859f821"),
-      unsplash("photo-1605191353027-d21e534a419a"),
+      unsplashCrop("photo-1583847268964-b28dc8f51f92", 0.3, 0.85, 2.2),
+      unsplashCrop("photo-1583847268964-b28dc8f51f92", 0.7, 0.9, 2.2),
     ],
     badge: "bestseller",
     rating: 4.7,
@@ -291,8 +297,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Deko",
     image: unsplash("photo-1631125915597-adf46a94e436"),
     images: [
-      unsplash("photo-1572853566597-b83cde546912"),
-      unsplash("photo-1633000116322-d7f5cb7d3ebb"),
+      unsplashCrop("photo-1631125915597-adf46a94e436", 0.4, 0.42, 2),
+      unsplashCrop("photo-1631125915597-adf46a94e436", 0.62, 0.42, 2),
     ],
     badge: "new",
     rating: 4.8,
@@ -309,8 +315,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Textilien",
     image: unsplash("photo-1600369672770-985fd30004eb"),
     images: [
-      unsplash("photo-1693382464215-2b9d3ad53086"),
-      unsplash("photo-1674475762498-75310193b4f4"),
+      unsplashCrop("photo-1600369672770-985fd30004eb", 0.5, 0.32, 1.8),
+      unsplashCrop("photo-1600369672770-985fd30004eb", 0.5, 0.6, 1.8),
     ],
     badge: null,
     rating: 4.9,
@@ -327,8 +333,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Deko",
     image: unsplash("photo-1603005674328-5123ec30fc53"),
     images: [
-      unsplash("photo-1613424777445-f93a2a48e285"),
-      unsplash("photo-1665512594386-051aad8b9f68"),
+      unsplashCrop("photo-1603005674328-5123ec30fc53", 0.25, 0.68, 2),
+      unsplashCrop("photo-1603005674328-5123ec30fc53", 0.55, 0.55, 2),
     ],
     badge: null,
     rating: 4.6,
@@ -345,8 +351,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Sofas",
     image: unsplash("photo-1617582907226-c49e2d8200d9"),
     images: [
-      unsplash("photo-1779105120112-923991ccf483"),
-      unsplash("photo-1710888451601-9885aeb8afe2"),
+      unsplashCrop("photo-1617582907226-c49e2d8200d9", 0.53, 0.42, 2),
+      unsplashCrop("photo-1617582907226-c49e2d8200d9", 0.53, 0.68, 2),
     ],
     badge: "new",
     rating: 4.6,
@@ -363,8 +369,8 @@ const data: (typeof products.$inferInsert)[] = [
     category: "Beleuchtung",
     image: unsplash("photo-1761864293821-033e75c1eba3"),
     images: [
-      unsplash("photo-1667312939978-64cf31718a6e"),
-      unsplash("photo-1642689703534-e41f29622078"),
+      unsplashCrop("photo-1761864293821-033e75c1eba3", 0.25, 0.32, 2),
+      unsplashCrop("photo-1761864293821-033e75c1eba3", 0.4, 0.6, 1.6),
     ],
     badge: null,
     rating: 4.4,
