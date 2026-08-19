@@ -10,7 +10,7 @@ export function Footer() {
               NOVA<span className="text-accent">.</span>
             </h4>
             <p className="mt-2 text-sm text-foreground/60">
-              Modernes Einkaufen, kuratiert mit KI.
+              Möbel & Wohnaccessoires, kuratiert mit KI.
             </p>
           </div>
           <div>

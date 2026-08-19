@@ -40,8 +40,9 @@ export default async function Home() {
             neu entdeckt.
           </h1>
           <p className="mt-5 max-w-md text-base text-foreground/70">
-            Kuratierte Dekoration, Technik, Mode und Outdoor-Ausstattung — mit
-            einem KI-Assistenten, der dir hilft, genau das Richtige zu finden.
+            Kuratierte Sofas, Möbel und Wohnaccessoires — mit einem
+            KI-Assistenten, der dir hilft, genau das Richtige für dein
+            Zuhause zu finden.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -108,11 +109,11 @@ export default async function Home() {
                 Gemütlich durch den Herbst
               </h2>
               <p className="mt-4 text-sm text-foreground/70">
-                Warme Decken, sanftes Licht und Textilien zum Verlieben —
-                entdeck unsere Wohnen-Kollektion.
+                Warme Decken, Kerzenschein und Textilien zum Verlieben —
+                entdeck unsere Textilien-Kollektion.
               </p>
               <Link
-                href="/products?category=Wohnen"
+                href="/products?category=Textilien"
                 className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-90"
               >
                 Kollektion ansehen

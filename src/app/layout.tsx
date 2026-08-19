@@ -20,8 +20,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "NOVA — Modern einkaufen",
-  description: "Ein moderner Webshop mit KI-gestützter Beratung und Suche.",
+  title: "NOVA — Möbel & Wohnaccessoires",
+  description:
+    "Kuratierte Sofas, Möbel und Wohnaccessoires — mit KI-gestützter Beratung und Suche.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,8 +1,8 @@
 export const categories = [
   "Alle",
-  "Technik",
-  "Wohnen",
-  "Mode",
-  "Outdoor",
-  "Beauty",
+  "Sofas",
+  "Möbel",
+  "Beleuchtung",
+  "Textilien",
+  "Deko",
 ] as const;

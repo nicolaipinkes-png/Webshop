@@ -106,7 +106,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
 
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
           <div className="max-w-[85%] rounded-2xl bg-surface-muted px-3.5 py-2 text-sm leading-relaxed text-foreground">
-            Hi! Ich bin dein Shopping-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;eine leichte Jacke für Herbstwanderungen&quot; — und ich helfe dir bei der Auswahl. Sag einfach &quot;leg das in den Warenkorb&quot;, wenn du etwas kaufen willst.
+            Hi! Ich bin dein Einrichtungs-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;ein gemütliches Sofa fürs Wohnzimmer&quot; — und ich helfe dir bei der Auswahl. Sag einfach &quot;leg das in den Warenkorb&quot;, wenn du etwas kaufen willst.
           </div>
 
           {messages.map((m) => (
