@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import Stripe from "stripe";
 import { db } from "@/lib/db";
-import { orders } from "@/lib/db/schema";
+import { orders, orderItems } from "@/lib/db/schema";
 import { stripe } from "@/lib/stripe";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -28,11 +29,42 @@ export async function POST(request: NextRequest) {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded": {
       const session = event.data.object as Stripe.Checkout.Session;
-      if (session.payment_status !== "unpaid") {
-        await db
-          .update(orders)
-          .set({ status: "paid", customerEmail: session.customer_details?.email })
-          .where(eq(orders.stripeSessionId, session.id));
+      if (session.payment_status === "unpaid") break;
+
+      // Only the request that flips confirmationEmailSentAt from null sends
+      // the email, so retried/duplicate Stripe events never double-send.
+      const [order] = await db
+        .update(orders)
+        .set({
+          status: "paid",
+          customerEmail: session.customer_details?.email,
+          confirmationEmailSentAt: new Date(),
+        })
+        .where(
+          and(
+            eq(orders.stripeSessionId, session.id),
+            isNull(orders.confirmationEmailSentAt)
+          )
+        )
+        .returning();
+
+      if (order?.customerEmail) {
+        const items = await db
+          .select()
+          .from(orderItems)
+          .where(eq(orderItems.orderId, order.id));
+
+        try {
+          await sendOrderConfirmationEmail({
+            to: order.customerEmail,
+            orderId: order.id,
+            items,
+            totalCents: order.totalCents,
+            currency: order.currency,
+          });
+        } catch (err) {
+          console.error("Failed to send order confirmation email", err);
+        }
       }
       break;
     }

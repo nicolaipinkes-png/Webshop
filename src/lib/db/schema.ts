@@ -28,6 +28,7 @@ export const orders = pgTable("orders", {
   totalCents: integer("total_cents").notNull(),
   currency: text("currency").notNull(),
   customerEmail: text("customer_email"),
+  confirmationEmailSentAt: timestamp("confirmation_email_sent_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
