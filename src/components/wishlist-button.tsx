@@ -4,25 +4,30 @@ import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product } from "@/lib/types";
 import { useWishlistStore } from "@/lib/wishlist-store";
+import { localizeProduct } from "@/lib/product-i18n";
+import { useDictionary, useLocale } from "@/lib/i18n/locale-context";
 
 export function WishlistButton({
-  product,
+  product: rawProduct,
   className,
 }: {
   product: Product;
   className?: string;
 }) {
-  const saved = useWishlistStore((s) => s.isSaved(product.id));
+  const saved = useWishlistStore((s) => s.isSaved(rawProduct.id));
   const toggle = useWishlistStore((s) => s.toggle);
+  const dict = useDictionary();
+  const locale = useLocale();
+  const name = localizeProduct(rawProduct, locale).name;
 
   return (
     <button
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        toggle(product);
+        toggle(rawProduct);
       }}
-      aria-label={saved ? `${product.name} von der Merkliste entfernen` : `${product.name} merken`}
+      aria-label={saved ? dict.product.wishlistRemoveLabel(name) : dict.product.wishlistAddLabel(name)}
       aria-pressed={saved}
       className={cn(
         "flex items-center justify-center rounded-full transition-colors",

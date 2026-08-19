@@ -13,6 +13,182 @@ function unsplash(id: string) {
   return `https://images.unsplash.com/${id}?w=1200&q=80&auto=format&fit=crop`;
 }
 
+const productTranslations: Record<
+  string,
+  Record<"en" | "fr" | "es", { name: string; description: string }>
+> = {
+  "1": {
+    en: {
+      name: "Luna Lounge Sofa",
+      description:
+        "A curved lounge sofa in heavy velvet that turns any room into a stage. Solid beech frame, removable and washable covers.",
+    },
+    fr: {
+      name: "Canapé Lounge Luna",
+      description:
+        "Un canapé lounge aux lignes courbes en velours épais qui transforme n’importe quelle pièce en véritable scène. Structure en hêtre massif, housses amovibles et lavables.",
+    },
+    es: {
+      name: "Sofá Lounge Luna",
+      description:
+        "Un sofá lounge de líneas curvas en terciopelo grueso que convierte cualquier estancia en un escenario. Estructura de haya maciza, fundas desenfundables y lavables.",
+    },
+  },
+  "2": {
+    en: {
+      name: "Nimbus Table Lamp",
+      description:
+        "Warm, dimmable light in a minimalist housing of brushed aluminium and oak. Turns any corner into a place to linger.",
+    },
+    fr: {
+      name: "Lampe de table Nimbus",
+      description:
+        "Une lumière chaude et modulable dans un boîtier minimaliste en aluminium brossé et chêne. Transforme n’importe quel coin en un lieu où l’on aime s’attarder.",
+    },
+    es: {
+      name: "Lámpara de mesa Nimbus",
+      description:
+        "Luz cálida y regulable en una carcasa minimalista de aluminio cepillado y roble. Convierte cualquier rincón en un lugar donde apetece quedarse.",
+    },
+  },
+  "3": {
+    en: {
+      name: "Suar Live-Edge Coffee Table",
+      description:
+        "Every table a one-off: crafted from a single slice of suar wood with visible grain and a live edge.",
+    },
+    fr: {
+      name: "Table basse en tronc de Suar",
+      description:
+        "Chaque table est une pièce unique, façonnée dans une seule tranche de bois de suar au veinage apparent et au bord brut.",
+    },
+    es: {
+      name: "Mesa de centro de tronco de Suar",
+      description:
+        "Cada mesa es una pieza única, tallada en una sola loncha de madera de suar con veta visible y borde natural.",
+    },
+  },
+  "4": {
+    en: {
+      name: "Boaz Sideboard",
+      description:
+        "Plenty of storage, clean lines: solid mango wood combined with rattan fronts for a warm, natural look in the living or dining room.",
+    },
+    fr: {
+      name: "Buffet Boaz",
+      description:
+        "Beaucoup de rangement, des lignes épurées : bois de manguier massif associé à des façades en rotin pour une allure chaleureuse et naturelle au salon ou dans la salle à manger.",
+    },
+    es: {
+      name: "Aparador Boaz",
+      description:
+        "Mucho espacio de almacenaje y líneas depuradas: madera maciza de mango combinada con frentes de ratán para un aspecto cálido y natural en el salón o el comedor.",
+    },
+  },
+  "5": {
+    en: {
+      name: "Juta Natural Fibre Rug",
+      description:
+        "Hand-woven from pure jute – robust, durable and with the organic touch that brings warmth to any living room.",
+    },
+    fr: {
+      name: "Tapis en fibres naturelles Juta",
+      description:
+        "Tissé main en jute pure – robuste, durable, avec cette touche organique qui apporte de la chaleur à tous les salons.",
+    },
+    es: {
+      name: "Alfombra de fibra natural Juta",
+      description:
+        "Tejida a mano con yute puro: robusta, duradera y con ese toque orgánico que aporta calidez a cualquier salón.",
+    },
+  },
+  "6": {
+    en: {
+      name: "Terra Vase Set",
+      description:
+        "Three hand-thrown vases in earthy tones – eye-catching alone or as a trio on a sideboard or dining table.",
+    },
+    fr: {
+      name: "Set de vases Terra",
+      description:
+        "Trois vases façonnés à la main dans des tons terreux – un vrai point d’accroche, seuls ou en trio, sur un buffet ou une table à manger.",
+    },
+    es: {
+      name: "Set de jarrones Terra",
+      description:
+        "Tres jarrones de cerámica hechos a mano en tonos tierra: un punto de atención, solos o en trío, sobre un aparador o una mesa de comedor.",
+    },
+  },
+  "7": {
+    en: {
+      name: "Cascade Cosy Throw",
+      description:
+        "Extra-soft brushed organic cotton in muted natural tones, machine-washable and pleasantly heavy – your new favourite spot on the sofa.",
+    },
+    fr: {
+      name: "Plaid douillet Cascade",
+      description:
+        "Coton bio brossé extra-doux dans des tons naturels sourds, lavable en machine et agréablement dense – votre nouvel endroit préféré sur le canapé.",
+    },
+    es: {
+      name: "Manta acogedora Cascade",
+      description:
+        "Algodón orgánico cepillado extra suave en tonos naturales apagados, lavable a máquina y agradablemente pesado: tu nuevo rincón favorito del sofá.",
+    },
+  },
+  "8": {
+    en: {
+      name: "Foglia Pillar Candle Set",
+      description:
+        "Five pillar candles in muted dusty rose, made from plant-based wax – for cosy evenings and atmospheric light.",
+    },
+    fr: {
+      name: "Set de bougies pilier Foglia",
+      description:
+        "Cinq bougies pilier dans un rose poudré discret, en cire végétale – pour des soirées cosy et une lumière pleine d’ambiance.",
+    },
+    es: {
+      name: "Set de velas gruesas Foglia",
+      description:
+        "Cinco velas gruesas en un rosa empolvado discreto, elaboradas con cera vegetal, para veladas acogedoras y una luz llena de ambiente.",
+    },
+  },
+  "9": {
+    en: {
+      name: "Rubino Cocktail Chair",
+      description:
+        "A statement chair in rich velvet red with slender metal legs – for anyone who isn't afraid of colour.",
+    },
+    fr: {
+      name: "Fauteuil cocktail Rubino",
+      description:
+        "Un fauteuil qui a du caractère, en velours rouge profond avec des pieds métalliques fins – pour celles et ceux qui n’ont pas peur de la couleur.",
+    },
+    es: {
+      name: "Sillón cóctel Rubino",
+      description:
+        "Un sillón con carácter en terciopelo rojo intenso con patas metálicas finas: para quienes no temen al color.",
+    },
+  },
+  "10": {
+    en: {
+      name: "Arco Arc Lamp",
+      description:
+        "The overhanging arc lamp casts precise light above the sofa or dining table – a striking eye-catcher included.",
+    },
+    fr: {
+      name: "Lampadaire arc Arco",
+      description:
+        "Le lampadaire arqué en surplomb diffuse une lumière ciblée au-dessus du canapé ou de la table à manger – un point d’accroche visuel garanti.",
+    },
+    es: {
+      name: "Lámpara de arco Arco",
+      description:
+        "La lámpara de arco en voladizo proyecta una luz precisa sobre el sofá o la mesa de comedor: un llamativo punto focal incluido.",
+    },
+  },
+};
+
 const data: (typeof products.$inferInsert)[] = [
   {
     id: "1",
@@ -253,7 +429,11 @@ async function main() {
   const base = new Date("2026-01-01T00:00:00Z").getTime();
 
   for (const [index, product] of data.entries()) {
-    const withTimestamp = { ...product, createdAt: new Date(base + index * 60_000) };
+    const withTimestamp = {
+      ...product,
+      translations: productTranslations[product.id] ?? null,
+      createdAt: new Date(base + index * 60_000),
+    };
     await db
       .insert(products)
       .values(withTimestamp)

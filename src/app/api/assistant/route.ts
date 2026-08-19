@@ -8,16 +8,28 @@ import { getAllProducts } from "@/lib/products";
 import { findOrders } from "@/lib/orders";
 import { categories } from "@/lib/categories";
 import { formatPrice } from "@/lib/utils";
+import { localizeProduct } from "@/lib/product-i18n";
+import { isLocale, defaultLocale, type Locale } from "@/lib/i18n/config";
+
+const languageNames: Record<Locale, string> = {
+  de: "Deutsch",
+  en: "English",
+  fr: "Français",
+  es: "Español",
+};
 
 export async function POST(request: Request) {
-  const { messages }: { messages: UIMessage[] } = await request.json();
+  const body = await request.json();
+  const { messages }: { messages: UIMessage[] } = body;
+  const rawLocale = String(body.locale ?? "");
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
 
   const catalog = await getAllProducts();
   const catalogListing = catalog
-    .map(
-      (p) =>
-        `- slug: "${p.slug}" | ${p.name} | Kategorie: ${p.category} | ${formatPrice(p.priceCents, p.currency)} | ${p.description}`
-    )
+    .map((p) => {
+      const localized = localizeProduct(p, locale);
+      return `- slug: "${p.slug}" | ${localized.name} | Kategorie: ${p.category} | ${formatPrice(p.priceCents, p.currency)} | ${localized.description}`;
+    })
     .join("\n");
 
   const systemPrompt = `Du bist der Einrichtungs-Assistent von NOVA, einem Online-Shop für Möbel und Wohnaccessoires.
@@ -28,12 +40,12 @@ Das ist der VOLLSTÄNDIGE Produktkatalog (das einzige, was es im Shop gibt):
 ${catalogListing}
 
 Regeln:
-- Antworte kurz, freundlich und auf Deutsch.
-- Nutze dein Sprachverständnis, um Kundenwünsche den passenden Produkten zuzuordnen, auch wenn der Begriff nicht wörtlich vorkommt (z.B. "Wohnzimmertisch" -> Couchtisch, "Kerzen" -> Stumpenkerzen-Set, "Regal" -> gibt es nicht, ehrlich sagen). Erfinde NIEMALS Produkte, die nicht in der Liste oben stehen.
+- Antworte IMMER auf ${languageNames[locale]} (Sprachcode: ${locale}), unabhängig von der Sprache dieser Systemanweisung. Halte den Ton kurz und freundlich.
+- Nutze dein Sprachverständnis, um Kundenwünsche den passenden Produkten zuzuordnen, auch wenn der Begriff nicht wörtlich vorkommt und selbst wenn die Anfrage in einer anderen Sprache gestellt wird (z.B. "Wohnzimmertisch"/"coffee table" -> Couchtisch, "Kerzen"/"candles" -> Stumpenkerzen-Set, "Regal"/"shelf" -> gibt es nicht, ehrlich sagen). Erfinde NIEMALS Produkte, die nicht in der Liste oben stehen.
 - Wenn du Produkte zeigen willst, rufe IMMER das Tool "showProducts" mit den passenden slugs auf (max. 4). Erfinde niemals Preise oder Eigenschaften – die Karten werden serverseitig mit echten Daten befüllt.
 - Wenn nichts passt, sag das ehrlich und frag nach mehr Details, statt etwas zu erfinden oder ein unpassendes Produkt zu zeigen.
-- Wenn der Kunde ausdrücklich sagt, dass er ein Produkt kaufen/in den Warenkorb legen möchte (z.B. "leg das in den Warenkorb", "ich nehme die Kopfhörer"), rufe das Tool "addToCart" mit dem passenden slug auf. Frag bei Unklarheit erst nach, welches Produkt gemeint ist.
-- Wenn der Kunde nach dem Status oder Verbleib einer Bestellung fragt (z.B. "Wo ist meine Bestellung?", "Ist meine Bestellung schon raus?"), rufe das Tool "checkOrderStatus" auf. Frag zuerst nach der Bestellnummer (aus der Bestätigungs-E-Mail) oder der E-Mail-Adresse, falls noch keine von beidem im Gespräch genannt wurde. Erfinde niemals einen Bestellstatus – nutze ausschließlich die Daten aus dem Tool-Ergebnis.
+- Wenn der Kunde ausdrücklich sagt, dass er ein Produkt kaufen/in den Warenkorb legen möchte (z.B. "leg das in den Warenkorb", "add that to my cart"), rufe das Tool "addToCart" mit dem passenden slug auf. Frag bei Unklarheit erst nach, welches Produkt gemeint ist.
+- Wenn der Kunde nach dem Status oder Verbleib einer Bestellung fragt (z.B. "Wo ist meine Bestellung?", "Where is my order?"), rufe das Tool "checkOrderStatus" auf. Frag zuerst nach der Bestellnummer (aus der Bestätigungs-E-Mail) oder der E-Mail-Adresse, falls noch keine von beidem im Gespräch genannt wurde. Erfinde niemals einen Bestellstatus – nutze ausschließlich die Daten aus dem Tool-Ergebnis.
 - Halte Textantworten auf 2-3 Sätze begrenzt; die Produktkarten sprechen für sich.`;
 
   const result = streamText({
@@ -60,16 +72,19 @@ Regeln:
             .select()
             .from(productsTable)
             .where(inArray(productsTable.slug, slugs));
-          return results.map((p) => ({
-            id: p.id,
-            slug: p.slug,
-            name: p.name,
-            priceCents: p.priceCents,
-            currency: p.currency,
-            image: p.image,
-            category: p.category,
-            rating: p.rating,
-          }));
+          return results.map((p) => {
+            const localized = localizeProduct(p, locale);
+            return {
+              id: p.id,
+              slug: p.slug,
+              name: localized.name,
+              priceCents: p.priceCents,
+              currency: p.currency,
+              image: p.image,
+              category: p.category,
+              rating: p.rating,
+            };
+          });
         },
       }),
       addToCart: tool({

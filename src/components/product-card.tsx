@@ -1,21 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import { Star, ShoppingBag } from "lucide-react";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
+import { localizeProduct } from "@/lib/product-i18n";
+import { useDictionary, useLocale } from "@/lib/i18n/locale-context";
 import { ProductImage } from "./product-image";
 import { WishlistButton } from "./wishlist-button";
+import { Link } from "./i18n-link";
 
-const badgeLabel: Record<string, string> = {
-  new: "Neu",
-  bestseller: "Bestseller",
-  sale: "Sale",
-};
-
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product: rawProduct }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
+  const dict = useDictionary();
+  const locale = useLocale();
+  const product = localizeProduct(rawProduct, locale);
+
+  const badgeLabel: Record<string, string> = {
+    new: dict.product.badgeNew,
+    bestseller: dict.product.badgeBestseller,
+    sale: dict.product.badgeSale,
+  };
 
   return (
     <div className="group flex flex-col">
@@ -29,7 +34,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </Link>
         <WishlistButton
-          product={product}
+          product={rawProduct}
           className="absolute right-3 top-3 h-8 w-8 border border-white/10 bg-black/50 backdrop-blur hover:border-accent"
         />
       </div>
@@ -43,11 +48,11 @@ export function ProductCard({ product }: { product: Product }) {
           <span>({product.reviewCount})</span>
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <span className="font-semibold">{formatPrice(product.priceCents, product.currency)}</span>
+          <span className="font-semibold">{formatPrice(product.priceCents, product.currency, locale)}</span>
           <button
-            onClick={() => addItem(product)}
+            onClick={() => addItem(rawProduct)}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent"
-            aria-label={`${product.name} in den Warenkorb legen`}
+            aria-label={dict.product.addToCartLabel(product.name)}
           >
             <ShoppingBag className="h-4 w-4" />
           </button>

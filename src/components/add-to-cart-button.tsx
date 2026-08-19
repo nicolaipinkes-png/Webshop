@@ -4,6 +4,7 @@ import { ShoppingBag } from "lucide-react";
 import { Product } from "@/lib/types";
 import { useCartStore } from "@/lib/cart-store";
 import { cn } from "@/lib/utils";
+import { useDictionary } from "@/lib/i18n/locale-context";
 
 export function AddToCartButton({
   product,
@@ -13,6 +14,7 @@ export function AddToCartButton({
   className?: string;
 }) {
   const addItem = useCartStore((s) => s.addItem);
+  const dict = useDictionary();
 
   return (
     <button
@@ -23,7 +25,7 @@ export function AddToCartButton({
       )}
     >
       <ShoppingBag className="h-4 w-4" />
-      In den Warenkorb
+      {dict.product.addToCart}
     </button>
   );
 }

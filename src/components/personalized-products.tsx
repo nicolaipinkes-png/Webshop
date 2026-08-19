@@ -3,12 +3,14 @@
 import { useStyleProfileStore } from "@/lib/style-profile-store";
 import { personalizedProducts } from "@/lib/personalize";
 import { useMounted } from "@/lib/use-mounted";
+import { useDictionary } from "@/lib/i18n/locale-context";
 import { Product } from "@/lib/types";
 import { ProductCard } from "./product-card";
 
 export function PersonalizedProducts({ products }: { products: Product[] }) {
   const mounted = useMounted();
   const profile = useStyleProfileStore((s) => s.profile);
+  const dict = useDictionary();
 
   if (!mounted || !profile) return null;
 
@@ -18,7 +20,7 @@ export function PersonalizedProducts({ products }: { products: Product[] }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mb-8 flex items-end justify-between">
-        <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">Für dich empfohlen</h2>
+        <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">{dict.home.recommendedForYou}</h2>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
         {recommended.map((p) => (

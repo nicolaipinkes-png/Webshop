@@ -1,3 +1,5 @@
+export type ProductTranslation = { name: string; description: string };
+
 export type Product = {
   id: string;
   slug: string;
@@ -12,4 +14,5 @@ export type Product = {
   rating: number;
   reviewCount: number;
   createdAt: Date;
+  translations: Record<string, ProductTranslation> | null;
 };

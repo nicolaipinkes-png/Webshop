@@ -3,10 +3,14 @@ import { inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orderItems, orders, products as productsTable } from "@/lib/db/schema";
 import { stripe } from "@/lib/stripe";
+import { isLocale, defaultLocale, type Locale } from "@/lib/i18n/config";
+import { localizeProduct } from "@/lib/product-i18n";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const items: { productId: string; quantity: number }[] = body.items;
+  const rawLocale = String(body.locale ?? "");
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
 
   if (!Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Warenkorb ist leer." }, { status: 400 });
@@ -40,16 +44,17 @@ export async function POST(request: NextRequest) {
   const origin = request.nextUrl.origin;
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    locale,
     line_items: lineItems.map((i) => ({
       price_data: {
         currency: i.product.currency.toLowerCase(),
         unit_amount: i.product.priceCents,
-        product_data: { name: i.product.name },
+        product_data: { name: localizeProduct(i.product, locale).name },
       },
       quantity: i.quantity,
     })),
-    success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/checkout`,
+    success_url: `${origin}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/${locale}/checkout`,
     client_reference_id: orderId,
     metadata: { orderId },
     shipping_address_collection: { allowed_countries: ["DE", "AT", "CH"] },

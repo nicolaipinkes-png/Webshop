@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { Search, ShoppingBag, Sparkles, Menu, X, Heart } from "lucide-react";
 import { useCartStore, cartItemCount } from "@/lib/cart-store";
 import { useWishlistStore } from "@/lib/wishlist-store";
 import { categories } from "@/lib/categories";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { Link } from "./i18n-link";
+import { LanguageSwitcher } from "./language-switcher";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,6 +15,7 @@ export function Header() {
   const openCart = useCartStore((s) => s.open);
   const count = cartItemCount(items);
   const wishlistCount = useWishlistStore((s) => s.items.length);
+  const dict = useDictionary();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
@@ -21,7 +24,7 @@ export function Header() {
           <button
             className="p-2 -ml-2 md:hidden"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Menü umschalten"
+            aria-label={dict.nav.menuToggle}
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -35,7 +38,7 @@ export function Header() {
                 href={c === "Alle" ? "/products" : `/products?category=${encodeURIComponent(c)}`}
                 className="text-sm text-foreground/70 transition-colors hover:text-foreground"
               >
-                {c}
+                {dict.categories[c]}
               </Link>
             ))}
           </nav>
@@ -45,13 +48,13 @@ export function Header() {
           <Link
             href="/search"
             className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted"
-            aria-label="Suchen"
+            aria-label={dict.nav.search}
           >
             <Search className="h-4.5 w-4.5" />
           </Link>
           <button
             className="flex h-9 w-9 items-center justify-center rounded-full text-accent transition-colors hover:bg-surface-muted"
-            aria-label="KI-Assistent öffnen"
+            aria-label={dict.nav.openAssistant}
             onClick={() => window.dispatchEvent(new CustomEvent("open-ai-assistant"))}
           >
             <Sparkles className="h-4.5 w-4.5" />
@@ -59,7 +62,7 @@ export function Header() {
           <Link
             href="/wishlist"
             className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted"
-            aria-label="Merkliste öffnen"
+            aria-label={dict.nav.openWishlist}
           >
             <Heart className="h-4.5 w-4.5" />
             {wishlistCount > 0 && (
@@ -70,7 +73,7 @@ export function Header() {
           </Link>
           <button
             className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-surface-muted"
-            aria-label="Warenkorb öffnen"
+            aria-label={dict.nav.openCart}
             onClick={openCart}
           >
             <ShoppingBag className="h-4.5 w-4.5" />
@@ -80,6 +83,7 @@ export function Header() {
               </span>
             )}
           </button>
+          <LanguageSwitcher />
         </div>
       </div>
 
@@ -92,7 +96,7 @@ export function Header() {
               className="rounded-md px-2 py-2 text-sm text-foreground/80 hover:bg-surface-muted"
               onClick={() => setMenuOpen(false)}
             >
-              {c}
+              {dict.categories[c]}
             </Link>
           ))}
         </nav>

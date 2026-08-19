@@ -1,10 +1,12 @@
 import {
   integer,
+  jsonb,
   pgTable,
   real,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import type { ProductTranslation } from "../types";
 
 export const products = pgTable("products", {
   id: text("id").primaryKey(),
@@ -16,6 +18,7 @@ export const products = pgTable("products", {
   category: text("category").notNull(),
   image: text("image").notNull(),
   images: text("images").array(),
+  translations: jsonb("translations").$type<Record<string, ProductTranslation>>(),
   badge: text("badge"),
   rating: real("rating").notNull(),
   reviewCount: integer("review_count").notNull(),

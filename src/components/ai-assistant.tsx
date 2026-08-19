@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { Sparkles, X, Send, Star, CheckCircle2, PackageSearch } from "lucide-react";
@@ -9,7 +8,10 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/types";
 import { useCartStore } from "@/lib/cart-store";
+import { localizeProduct } from "@/lib/product-i18n";
+import { useDictionary, useLocale } from "@/lib/i18n/locale-context";
 import { ProductImage } from "./product-image";
+import { Link } from "./i18n-link";
 
 type RecommendedProduct = {
   id: string;
@@ -36,20 +38,22 @@ type OrderStatusOutput =
       }[];
     };
 
-const orderStatusLabel: Record<string, string> = {
-  pending: "Zahlung ausstehend",
-  paid: "Bezahlt · wird vorbereitet",
-  failed: "Zahlung fehlgeschlagen",
-};
-
 export function AiAssistant({ products }: { products: Product[] }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const addItem = useCartStore((s) => s.addItem);
+  const dict = useDictionary();
+  const locale = useLocale();
+
+  const orderStatusLabel: Record<string, string> = {
+    pending: orderStatusLabelFor(locale, "pending"),
+    paid: orderStatusLabelFor(locale, "paid"),
+    failed: orderStatusLabelFor(locale, "failed"),
+  };
 
   const { messages, sendMessage, status, addToolResult } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/assistant" }),
+    transport: new DefaultChatTransport({ api: "/api/assistant", body: { locale } }),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: async ({ toolCall }) => {
       if (toolCall.toolName !== "addToCart") return;
@@ -63,7 +67,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
           tool: "addToCart",
           toolCallId: toolCall.toolCallId,
           state: "output-error",
-          errorText: "Produkt nicht gefunden.",
+          errorText: "Product not found.",
         });
         return;
       }
@@ -71,7 +75,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
       addToolResult({
         tool: "addToCart",
         toolCallId: toolCall.toolCallId,
-        output: { name: product.name, quantity },
+        output: { name: localizeProduct(product, locale).name, quantity },
       });
     },
   });
@@ -103,7 +107,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
           "fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-105",
           open && "scale-0"
         )}
-        aria-label="KI-Assistent öffnen"
+        aria-label={dict.nav.openAssistant}
       >
         <Sparkles className="h-6 w-6" />
       </button>
@@ -117,16 +121,16 @@ export function AiAssistant({ products }: { products: Product[] }) {
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium">Shopping-Assistent</span>
+            <span className="text-sm font-medium">{dict.assistant.title}</span>
           </div>
-          <button onClick={() => setOpen(false)} aria-label="Schließen" className="rounded-full p-1 hover:bg-surface-muted">
+          <button onClick={() => setOpen(false)} aria-label={dict.nav.closeAssistant} className="rounded-full p-1 hover:bg-surface-muted">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
           <div className="max-w-[85%] rounded-2xl bg-surface-muted px-3.5 py-2 text-sm leading-relaxed text-foreground">
-            Hi! Ich bin dein Einrichtungs-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;ein gemütliches Sofa fürs Wohnzimmer&quot; — und ich helfe dir bei der Auswahl. Sag einfach &quot;leg das in den Warenkorb&quot;, wenn du etwas kaufen willst.
+            {dict.assistant.greeting}
           </div>
 
           {messages.map((m) => (
@@ -167,7 +171,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
                               {p.rating}
                             </span>
                             <span className="text-xs font-semibold">
-                              {formatPrice(p.priceCents, p.currency)}
+                              {formatPrice(p.priceCents, p.currency, locale)}
                             </span>
                           </div>
                         </Link>
@@ -183,7 +187,7 @@ export function AiAssistant({ products }: { products: Product[] }) {
                       className="flex items-center gap-2 rounded-2xl bg-surface-muted px-3.5 py-2 text-sm text-foreground"
                     >
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
-                      {output.quantity}× {output.name} in den Warenkorb gelegt
+                      {dict.assistant.addedToCart(output.quantity, output.name)}
                     </div>
                   );
                 }
@@ -201,14 +205,12 @@ export function AiAssistant({ products }: { products: Product[] }) {
                             <PackageSearch className="h-4 w-4 shrink-0 text-accent" />
                             {orderStatusLabel[order.status] ?? order.status}
                           </div>
-                          <p className="mt-1 text-xs text-foreground/60">
-                            Bestellnummer: {order.id}
-                          </p>
+                          <p className="mt-1 text-xs text-foreground/60">#{order.id}</p>
                           <p className="mt-1 text-xs text-foreground/70">
                             {order.items.map((it) => `${it.quantity}× ${it.name}`).join(", ")}
                           </p>
                           <p className="mt-1 text-xs font-medium">
-                            {formatPrice(order.totalCents, order.currency)}
+                            {formatPrice(order.totalCents, order.currency, locale)}
                           </p>
                         </div>
                       ))}
@@ -232,14 +234,14 @@ export function AiAssistant({ products }: { products: Product[] }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Frag nach einer Empfehlung…"
+            placeholder={dict.assistant.placeholder}
             className="h-10 flex-1 rounded-full border border-border bg-background px-4 text-sm outline-none focus:border-accent"
           />
           <button
             onClick={send}
             disabled={pending}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground disabled:opacity-50"
-            aria-label="Senden"
+            aria-label={dict.assistant.send}
           >
             <Send className="h-4 w-4" />
           </button>
@@ -247,4 +249,14 @@ export function AiAssistant({ products }: { products: Product[] }) {
       </div>
     </>
   );
+}
+
+function orderStatusLabelFor(locale: string, status: "pending" | "paid" | "failed"): string {
+  const labels: Record<string, Record<string, string>> = {
+    de: { pending: "Zahlung ausstehend", paid: "Bezahlt · wird vorbereitet", failed: "Zahlung fehlgeschlagen" },
+    en: { pending: "Payment pending", paid: "Paid · being prepared", failed: "Payment failed" },
+    fr: { pending: "Paiement en attente", paid: "Payé · en préparation", failed: "Échec du paiement" },
+    es: { pending: "Pago pendiente", paid: "Pagado · en preparación", failed: "Pago fallido" },
+  };
+  return labels[locale]?.[status] ?? labels.de[status];
 }

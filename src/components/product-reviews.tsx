@@ -1,8 +1,10 @@
 import { Star } from "lucide-react";
 import { getReviewsByProductId } from "@/lib/reviews";
-import { submitReview } from "@/app/(shop)/products/[slug]/actions";
+import { submitReview } from "@/app/[locale]/(shop)/products/[slug]/actions";
 import { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -17,12 +19,15 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export async function ProductReviews({ product }: { product: Product }) {
-  const reviews = await getReviewsByProductId(product.id);
+export async function ProductReviews({ product, locale }: { product: Product; locale: Locale }) {
+  const [reviews, dict] = await Promise.all([
+    getReviewsByProductId(product.id),
+    getDictionary(locale),
+  ]);
 
   return (
     <section id="bewertungen" className="mt-20 border-t border-border pt-16">
-      <h2 className="mb-8 text-xl font-semibold tracking-tight">Bewertungen</h2>
+      <h2 className="mb-8 text-xl font-semibold tracking-tight">{dict.product.reviewsTitle}</h2>
 
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
@@ -39,23 +44,26 @@ export async function ProductReviews({ product }: { product: Product }) {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-foreground/60">
-              Noch keine Bewertungen. Sei die/der Erste!
-            </p>
+            <p className="text-sm text-foreground/60">{dict.product.noReviews}</p>
           )}
         </div>
 
         <form action={submitReview} className="max-w-md space-y-4">
           <input type="hidden" name="productId" value={product.id} />
           <input type="hidden" name="slug" value={product.slug} />
+          <input type="hidden" name="locale" value={locale} />
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">Name</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">
+              {dict.product.reviewName}
+            </label>
             <input name="authorName" required maxLength={60} className="input" />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">Bewertung</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">
+              {dict.product.reviewRating}
+            </label>
             <select name="rating" defaultValue="5" className="input">
               <option value="5">★★★★★ (5)</option>
               <option value="4">★★★★☆ (4)</option>
@@ -66,7 +74,9 @@ export async function ProductReviews({ product }: { product: Product }) {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">Kommentar</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground-muted">
+              {dict.product.reviewComment}
+            </label>
             <textarea name="comment" required rows={3} maxLength={500} className="input resize-none" />
           </div>
 
@@ -74,7 +84,7 @@ export async function ProductReviews({ product }: { product: Product }) {
             type="submit"
             className="h-11 rounded-full bg-accent px-6 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
           >
-            Bewertung abschicken
+            {dict.product.reviewSubmit}
           </button>
         </form>
       </div>

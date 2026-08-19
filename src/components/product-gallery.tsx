@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { ProductImage } from "./product-image";
+import { useDictionary } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
 
 export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const [active, setActive] = useState(0);
+  const dict = useDictionary();
 
   return (
     <div>
@@ -22,7 +24,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
             <button
               key={src}
               onClick={() => setActive(i)}
-              aria-label={`Bild ${i + 1} von ${images.length} anzeigen`}
+              aria-label={dict.product.galleryImageLabel(i + 1, images.length)}
               aria-current={i === active}
               className={cn(
                 "relative isolate aspect-square overflow-hidden rounded-xl ring-1 ring-white/5 transition-opacity",
