@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { Sparkles, X, Send, Star } from "lucide-react";
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
+import { Sparkles, X, Send, Star, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
+import { Product } from "@/lib/types";
+import { useCartStore } from "@/lib/cart-store";
 import { ProductImage } from "./product-image";
 
 type RecommendedProduct = {
@@ -20,13 +22,38 @@ type RecommendedProduct = {
   rating: number;
 };
 
-export function AiAssistant() {
+export function AiAssistant({ products }: { products: Product[] }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const addItem = useCartStore((s) => s.addItem);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, addToolResult } = useChat({
     transport: new DefaultChatTransport({ api: "/api/assistant" }),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    onToolCall: async ({ toolCall }) => {
+      if (toolCall.toolName !== "addToCart") return;
+      const { slug, quantity } = toolCall.input as {
+        slug: string;
+        quantity: number;
+      };
+      const product = products.find((p) => p.slug === slug);
+      if (!product) {
+        addToolResult({
+          tool: "addToCart",
+          toolCallId: toolCall.toolCallId,
+          state: "output-error",
+          errorText: "Produkt nicht gefunden.",
+        });
+        return;
+      }
+      for (let i = 0; i < quantity; i++) addItem(product);
+      addToolResult({
+        tool: "addToCart",
+        toolCallId: toolCall.toolCallId,
+        output: { name: product.name, quantity },
+      });
+    },
   });
 
   useEffect(() => {
@@ -79,7 +106,7 @@ export function AiAssistant() {
 
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
           <div className="max-w-[85%] rounded-2xl bg-surface-muted px-3.5 py-2 text-sm leading-relaxed text-foreground">
-            Hi! Ich bin dein Shopping-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;eine leichte Jacke für Herbstwanderungen&quot; — und ich helfe dir bei der Auswahl.
+            Hi! Ich bin dein Shopping-Assistent. Beschreib mir, wonach du suchst — z.B. &quot;eine leichte Jacke für Herbstwanderungen&quot; — und ich helfe dir bei der Auswahl. Sag einfach &quot;leg das in den Warenkorb&quot;, wenn du etwas kaufen willst.
           </div>
 
           {messages.map((m) => (
@@ -100,7 +127,7 @@ export function AiAssistant() {
                     </div>
                   );
                 }
-                if (part.type === "tool-recommendProducts" && part.state === "output-available") {
+                if (part.type === "tool-showProducts" && part.state === "output-available") {
                   const products = part.output as RecommendedProduct[];
                   if (products.length === 0) return null;
                   return (
@@ -125,6 +152,18 @@ export function AiAssistant() {
                           </div>
                         </Link>
                       ))}
+                    </div>
+                  );
+                }
+                if (part.type === "tool-addToCart" && part.state === "output-available") {
+                  const output = part.output as { name: string; quantity: number };
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 rounded-2xl bg-surface-muted px-3.5 py-2 text-sm text-foreground"
+                    >
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                      {output.quantity}× {output.name} in den Warenkorb gelegt
                     </div>
                   );
                 }

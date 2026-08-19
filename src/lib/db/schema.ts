@@ -18,6 +18,7 @@ export const products = pgTable("products", {
   badge: text("badge"),
   rating: real("rating").notNull(),
   reviewCount: integer("review_count").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const orders = pgTable("orders", {

@@ -1,10 +1,10 @@
-import { eq, ilike, or } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "./db";
 import { products as productsTable } from "./db/schema";
 import { Product } from "./types";
 
 export async function getAllProducts(): Promise<Product[]> {
-  return db.select().from(productsTable);
+  return db.select().from(productsTable).orderBy(asc(productsTable.createdAt));
 }
 
 export async function getProductsByCategory(
@@ -14,7 +14,8 @@ export async function getProductsByCategory(
   return db
     .select()
     .from(productsTable)
-    .where(eq(productsTable.category, category));
+    .where(eq(productsTable.category, category))
+    .orderBy(asc(productsTable.createdAt));
 }
 
 export async function getProductBySlug(
@@ -27,18 +28,10 @@ export async function getProductBySlug(
   return product;
 }
 
-export async function searchProducts(query: string): Promise<Product[]> {
-  const q = query.trim();
-  if (!q) return getAllProducts();
-  const pattern = `%${q}%`;
-  return db
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const [product] = await db
     .select()
     .from(productsTable)
-    .where(
-      or(
-        ilike(productsTable.name, pattern),
-        ilike(productsTable.description, pattern),
-        ilike(productsTable.category, pattern)
-      )
-    );
+    .where(eq(productsTable.id, id));
+  return product;
 }

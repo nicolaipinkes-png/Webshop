@@ -128,11 +128,14 @@ const data: (typeof products.$inferInsert)[] = [
 ];
 
 async function main() {
-  for (const product of data) {
+  const base = new Date("2026-01-01T00:00:00Z").getTime();
+
+  for (const [index, product] of data.entries()) {
+    const withTimestamp = { ...product, createdAt: new Date(base + index * 60_000) };
     await db
       .insert(products)
-      .values(product)
-      .onConflictDoUpdate({ target: products.id, set: product });
+      .values(withTimestamp)
+      .onConflictDoUpdate({ target: products.id, set: withTimestamp });
   }
   console.log(`Seeded/updated ${data.length} products.`);
   process.exit(0);

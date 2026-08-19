@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { CartDrawer } from "@/components/cart-drawer";
-import { AiAssistant } from "@/components/ai-assistant";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CartDrawer />
-        <AiAssistant />
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
